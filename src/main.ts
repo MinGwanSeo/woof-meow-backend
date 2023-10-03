@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
-import { ValidationPipe, Logger, LoggerService, RequestMethod } from "@nestjs/common";
+import { ValidationPipe, LoggerService } from "@nestjs/common";
 import compression from '@fastify/compress';
 import cookie from '@fastify/cookie';
 import helmet from '@fastify/helmet';
@@ -13,12 +13,17 @@ import { loggerConfig } from "./common/logger.config";
 export class PinoLoggerService implements LoggerService {
   private readonly logger = new PinoLogger(loggerConfig);
 
-  constructor(context?: string) {
-    this.logger.setContext(context || 'Woof-Meow-Backend');
-  }
+  constructor() { }
 
+  public setContext(context: string) {
+    this.logger.setContext(context);
+  }
   public log(message: string) {
     this.logger.info(message);
+  }
+
+  public debug(message: string) {
+    this.logger.debug(message);
   }
 
   public error(message: string, trace: string) {
@@ -31,7 +36,8 @@ export class PinoLoggerService implements LoggerService {
 }
 
 async function bootstrap() {
-  const pinoLogger = new PinoLoggerService('Bootstrap');
+  const pinoLogger = new PinoLoggerService();
+  pinoLogger.setContext('Bootstrap');
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({ trustProxy: true }),
@@ -57,7 +63,9 @@ async function bootstrap() {
   setupValidation(app);
 
   await app.listen(DEFAULT_PORT).then(() => {
-    pinoLogger.log(`server listening on port http://localhost:${DEFAULT_PORT}`);
+    pinoLogger.debug('###################################################');
+    pinoLogger.debug(`🚀 SEVER LISTENING ON PORT \x1b[4mhttp://localhost:${DEFAULT_PORT}\x1b[0m 🎉`);
+    pinoLogger.debug('###################################################');
   }).catch((error) => {
     pinoLogger.error('Error during bootstrap:', error);
     process.exit(1);
@@ -93,7 +101,7 @@ function setupValidation(app: NestFastifyApplication) {
   app.useGlobalPipes(new ValidationPipe());
 }
 
-function setupSwagger(app: NestFastifyApplication, SWAGGER_ENDPOINT: string, env: string, logger: LoggerService) {
+function setupSwagger(app: NestFastifyApplication, SWAGGER_ENDPOINT: string, env: string, logger: PinoLoggerService) {
   const version = env === 'local'
     ? 'local'
     : `${new Date().toLocaleString('ko-KR', {
@@ -121,7 +129,7 @@ function setupSwagger(app: NestFastifyApplication, SWAGGER_ENDPOINT: string, env
     },
   });
 
-  logger.log(`Swagger is running on http://localhost:${env}/${SWAGGER_ENDPOINT}`);
+  logger.debug(`Swagger IS ENABLED! \x1b[4mhttp://localhost:${env}/${SWAGGER_ENDPOINT}\x1b[0m`);
 }
 
 bootstrap();
