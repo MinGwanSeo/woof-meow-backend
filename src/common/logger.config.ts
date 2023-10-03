@@ -1,18 +1,42 @@
 import { RequestMethod } from "@nestjs/common";
 
 const { NODE_ENV = 'local' } = process.env;
-
+/**
+ * @description
+ * This is the configuration for the logger.
+ * It is used in the main.ts file to configure the logger.
+ *
+ * @see https://github.com/pinojs/pino
+ * @see https://github.com/pinojs/pino-pretty
+ */
 export const loggerConfig = {
     pinoHttp: {
+        level: NODE_ENV === 'local' ? 'debug' : 'info',
+        transport: {
+            target: 'pino-pretty',
+            options: {
+                colorize: true,
+                ignore: 'pid,hostname',
+                singleLine: true,
+            }
+        },
         redact: ['req.headers.authorization'],
         serializers: {
-            req: () => ({}),
-            res: () => ({}),
+            req: (req: Record<string, string | number | any>) => ({
+                method: req.method,
+                url: req.url,
+                query: req.query,
+                body: req.body,
+            }),
+            res: (res: Record<string, string | number | any>) => ({
+                statusCode: res.statusCode,
+                body: res.body,
+            }),
+
         },
         base: null,
         hooks: {
-            logMethod: function (args: any[], method) {
-                const currentTime = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+            logMethod: function (args: Record<string, string | number | any>, method: Function) {
                 const originalMessage = args[1] || '';
 
                 let contextOrMethodUrl = '';
@@ -25,7 +49,7 @@ export const loggerConfig = {
                     contextOrMethodUrl = `[${reqMethod}] [${reqUrl}]`;
                 }
 
-                const formattedMessage = `[${currentTime}] - [${this.level.toUpperCase()}] (PID: ${process.pid}) [${NODE_ENV.toUpperCase()}] - ${contextOrMethodUrl} - ${originalMessage}`;
+                const formattedMessage = `${process.pid} ${contextOrMethodUrl} - ${originalMessage}`;
 
                 const newArgs = [formattedMessage];
 
