@@ -30,6 +30,7 @@ export class DatabaseService {
                 username: this.configService.get<string>('DATABASE_USER') || 'root',
                 password: this.configService.get<string>('DATABASE_PASSWORD') || '1234',
                 database: this.configService.get<string>('DATABASE_NAME') || 'WoofMeow',
+                entities: [__dirname + '../**/*.entity{.ts,.js}'],
             });
         } catch (error) {
             this.logger.error(`❌ DATABASE CONNECTION ERROR! ${error.message}`, error.stack);
