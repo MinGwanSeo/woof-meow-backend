@@ -14,11 +14,7 @@ export class PinoLoggerService implements LoggerService {
   private readonly logger = new PinoLogger(loggerConfig);
 
   constructor(context?: string) {
-    this.logger.setContext(context || 'PinoLoggerService');
-  }
-
-  private setContext(context: string) {
-    this.logger.setContext(context);
+    this.logger.setContext(context || 'Woof-Meow-Backend');
   }
 
   public log(message: string) {
@@ -35,7 +31,6 @@ export class PinoLoggerService implements LoggerService {
 }
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
   const pinoLogger = new PinoLoggerService('Bootstrap');
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
