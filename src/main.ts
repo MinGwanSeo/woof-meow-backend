@@ -1,39 +1,14 @@
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
-import { ValidationPipe, LoggerService } from "@nestjs/common";
+import { ValidationPipe } from "@nestjs/common";
 import compression from '@fastify/compress';
 import cookie from '@fastify/cookie';
 import helmet from '@fastify/helmet';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "src/app.module";
 import { ConfigService } from '@nestjs/config';
-import { PinoLogger } from "nestjs-pino";
-import { loggerConfig } from "./common/logger.config";
+import { PinoLoggerService } from "./pino-logger/pino-logger.service";
 
-export class PinoLoggerService implements LoggerService {
-  private readonly logger = new PinoLogger(loggerConfig);
-
-  constructor() { }
-
-  public setContext(context: string) {
-    this.logger.setContext(context);
-  }
-  public log(message: string) {
-    this.logger.info(message);
-  }
-
-  public debug(message: string) {
-    this.logger.debug(message);
-  }
-
-  public error(message: string, trace: string) {
-    this.logger.error(message, trace);
-  }
-
-  public warn(message: string) {
-    this.logger.warn(message);
-  }
-}
 
 async function bootstrap() {
   const pinoLogger = new PinoLoggerService();

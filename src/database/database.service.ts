@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PinoLoggerService } from 'src/main';
+import { PinoLoggerService } from 'src/pino-logger/pino-logger.service';
 import { DataSource } from 'typeorm';
 
 const ENV = process.env.NODE_ENV || 'local';

@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -20,5 +20,13 @@ export class AppController {
   @Get('api/version')
   getVersion(): string {
     return this.appService.getVersion();
+  }
+
+  @Get('exception')
+  triggerException() {
+    const error = new HttpException('An error occurred', 500);
+    // 커스텀 속성 추가
+    (error as any).sourceClass = this.constructor.name;
+    throw error;
   }
 }

@@ -1,4 +1,5 @@
 import { RequestMethod } from "@nestjs/common";
+import { IncomingMessage, ServerResponse } from 'http';
 
 const { NODE_ENV = 'local' } = process.env;
 /**
@@ -58,7 +59,7 @@ export const loggerConfig = {
         },
     },
     exclude: [
-        { path: 'health', method: RequestMethod.ALL },
+        // { path: 'health', method: RequestMethod.ALL },
         { path: '/api-docs/(.*)', method: RequestMethod.ALL },
         { path: '/api-docs', method: RequestMethod.ALL },
         { path: 'api/version', method: RequestMethod.ALL },
