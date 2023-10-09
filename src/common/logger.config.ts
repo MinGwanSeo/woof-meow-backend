@@ -1,15 +1,7 @@
 import { RequestMethod } from "@nestjs/common";
-import { IncomingMessage, ServerResponse } from 'http';
 
 const { NODE_ENV = 'local' } = process.env;
-/**
- * @description
- * This is the configuration for the logger.
- * It is used in the main.ts file to configure the logger.
- *
- * @see https://github.com/pinojs/pino
- * @see https://github.com/pinojs/pino-pretty
- */
+
 export const loggerConfig = {
     pinoHttp: {
         level: NODE_ENV === 'local' ? 'debug' : 'info',
@@ -23,45 +15,60 @@ export const loggerConfig = {
         },
         redact: ['req.headers.authorization'],
         serializers: {
-            req: (req: Record<string, string | number | any>) => ({
-                method: req.method,
-                url: req.url,
-                query: req.query,
-                body: req.body,
-            }),
-            res: (res: Record<string, string | number | any>) => ({
-                statusCode: res.statusCode,
-                body: res.body,
-            }),
-
+            req: requestSerializer,
+            res: responseSerializer,
         },
         base: null,
         hooks: {
-            logMethod: function (args: Record<string, string | number | any>, method: Function) {
-                const originalMessage = args[1] || '';
-
-                let contextOrMethodUrl = '';
-
-                if (args[0].context) { // context is set when using the LoggerService
-                    contextOrMethodUrl = `[${args[0].context}]`;
-                } else {
-                    const reqMethod = args[0]?.res?.req?.method || 'UNKNOWN_METHOD';
-                    const reqUrl = args[0]?.res?.req?.url || 'UNKNOWN_URL';
-                    contextOrMethodUrl = `[${reqMethod}] [${reqUrl}]`;
-                }
-
-                const formattedMessage = `${process.pid} ${contextOrMethodUrl} - ${originalMessage}`;
-
-                const newArgs = [formattedMessage];
-
-                method.apply(this, newArgs);
-            }
-        },
+            logMethod: formatLogMethod
+        }
     },
     exclude: [
-        // { path: 'health', method: RequestMethod.ALL },
         { path: '/api-docs/(.*)', method: RequestMethod.ALL },
         { path: '/api-docs', method: RequestMethod.ALL },
         { path: 'api/version', method: RequestMethod.ALL },
     ],
+}
+
+function requestSerializer(req: Record<string, any>) {
+    return {
+        method: req.method,
+        url: req.url,
+        query: JSON.stringify(req.query, null, 4),
+        body: JSON.stringify(req.body, null, 4)
+    };
+}
+
+function responseSerializer(res: Record<string, any>) {
+    return {
+        statusCode: res.statusCode,
+        body: JSON.stringify(res.body, null, 4)    // Adds indentation for better readability
+    };
+}
+
+
+function formatLogMethod(args: Record<string, any>, method: Function) { // TODO: response body 출력
+    const originalMessage = args[1] || '';
+    let contextOrMethodUrl = '';
+    let requestInfo = args.request ? `\nRequest: ${JSON.stringify(args.request)}` : ''; // 추가한 요청 정보 출력
+    let formattedMessage = originalMessage + requestInfo + '\n';
+
+    if (!isError(args)) {
+        if (hasContext(args)) {
+            contextOrMethodUrl = `[ ${args[0].context} ]`;
+            formattedMessage = `${contextOrMethodUrl} - ${originalMessage}` + requestInfo;
+        }
+        const newArgs = [formattedMessage];
+
+        method.apply(this, newArgs);
+    }
+}
+
+
+function isError(args: Record<string, any>): boolean {
+    return args[0].res && args[0].res.statusCode >= 400;
+}
+
+function hasContext(args: Record<string, any>): boolean {
+    return args[0].context;
 }

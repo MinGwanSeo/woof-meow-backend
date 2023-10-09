@@ -10,6 +10,7 @@ export class PinoLoggerService implements LoggerService {
     public setContext(context: string) {
         this.logger.setContext(context);
     }
+
     public log(message: string) {
         this.logger.info(message);
     }
@@ -18,7 +19,7 @@ export class PinoLoggerService implements LoggerService {
         this.logger.debug(message);
     }
 
-    public error(message: string, trace: string) {
+    public error(message: string, trace?: string) {
         this.logger.error(message, trace);
     }
 

@@ -1,9 +1,12 @@
-import { BaseEntity, Column, Entity } from "typeorm";
+import { BaseEntity, Column } from "typeorm";
 
 type EntityStatus = 'ACTIVE' | 'DELETED' | 'INACTIVE';
 
-@Entity()
 export abstract class DeletableEntity extends BaseEntity {
-    @Column({ type: 'string', nullable: false })
+    @Column({ type: 'varchar', nullable: false })
     entityStatus: EntityStatus;
+
+
+    @Column({ type: 'timestamp', nullable: true })
+    deletedAt: Date;
 }

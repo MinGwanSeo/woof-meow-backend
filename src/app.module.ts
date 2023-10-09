@@ -7,9 +7,11 @@ import { loggerConfig } from './common/logger.config';
 import { DatabaseService } from './database/database.service';
 import { UsersModule } from './users/users.module';
 import { PetsModule } from './pets/pets.module';
-import { PinoLoggerService } from './pino-logger/pino-logger.service';
 import { BaseExceptionFilter } from './exceptions'
 import { APP_FILTER } from '@nestjs/core';
+import { DatabaseModule } from './database/database.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PinoLoggerModule } from './pino-logger/pino-logger.module';
 
 const ENV = process.env.NODE_ENV || 'local';
 @Module({
@@ -17,7 +19,6 @@ const ENV = process.env.NODE_ENV || 'local';
   providers: [
     AppService,
     DatabaseService,
-    PinoLoggerService,
     {
       provide: APP_FILTER,
       useClass: BaseExceptionFilter,
@@ -29,8 +30,14 @@ const ENV = process.env.NODE_ENV || 'local';
       envFilePath: `${ENV}.env`
     }),
     LoggerModule.forRoot(loggerConfig),
+    TypeOrmModule.forRootAsync({
+      imports: [DatabaseModule, ConfigModule, PinoLoggerModule], // 필요한 모듈을 추가
+      useClass: DatabaseService,
+    }),
+    DatabaseModule,
     UsersModule,
-    PetsModule
-  ]
+    PetsModule,
+    PinoLoggerModule
+  ],
 })
 export class AppModule { }
