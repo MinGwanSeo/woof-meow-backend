@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { PinoLoggerService } from 'src/pino-logger/pino-logger.service';
+import { PinoLoggerService } from '../pino-logger/pino-logger.service';
 
 @Injectable()
 export class DatabaseService {
@@ -13,8 +13,10 @@ export class DatabaseService {
     }
 
     getConnectionOptions(): TypeOrmModuleOptions {
-        this.logger.debug('getConnectionOptions() : ' + process.env.NODE_ENV);
-        if (process.env.NODE_ENV === 'local') {
+        const isLocal = this.configService.get<string>('NODE_ENV') === 'local';
+        this.logger.debug(`getConnectionOptions() : ${isLocal ? 'local' : 'production'}`);
+
+        if (isLocal) {
             return {
                 type: 'mysql',
                 host: 'localhost',

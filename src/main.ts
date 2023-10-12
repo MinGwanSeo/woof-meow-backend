@@ -5,7 +5,7 @@ import compression from '@fastify/compress';
 import cookie from '@fastify/cookie';
 import helmet from '@fastify/helmet';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { AppModule } from "src/app.module";
+import { AppModule } from "../src/app.module";
 import { ConfigService } from '@nestjs/config';
 import { PinoLoggerService } from "./pino-logger/pino-logger.service";
 
