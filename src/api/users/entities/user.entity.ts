@@ -1,20 +1,14 @@
-import { DeletableEntity } from '../../common/entities/deletable.entity';
+import { DeletableEntity } from 'src/common/entities/deletable.entity';
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 type LoginType = 'LOCAL' | 'GOOGLE' | 'FACEBOOK' | 'KAKAO';
 
 @Entity('user')
-@Unique(['socialId', 'loginType'])
+@Unique(['socialId'])
 export class User extends DeletableEntity {
 
-    @PrimaryGeneratedColumn()
-    id: number;
-
     @Column({ type: 'varchar', nullable: false })
-    firstName: string;
-
-    @Column({ type: 'varchar', nullable: false })
-    lastName: string;
+    name: string;
 
     @Column({ type: 'varchar', nullable: true })
     email: string;

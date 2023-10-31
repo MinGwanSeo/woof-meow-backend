@@ -1,4 +1,5 @@
-import { BaseEntity, Column } from "typeorm";
+import {  Column } from "typeorm";
+import { BaseEntity } from "./base.entity";
 
 type EntityStatus = 'ACTIVE' | 'DELETED' | 'INACTIVE';
 

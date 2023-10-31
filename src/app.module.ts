@@ -6,8 +6,8 @@ import { BaseExceptionFilter } from './exceptions';
 import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PinoLoggerModule } from './pino-logger/pino-logger.module';
-import { UsersModule } from './users/users.module';
-import { PetsModule } from './pets/pets.module';
+import { UsersModule } from './api/users/users.module';
+import { PetsModule } from './api/pets/pets.module';
 import { DatabaseService } from './database/database.service';
 
 @Module({
