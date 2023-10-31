@@ -1,5 +1,5 @@
 import { DeletableEntity } from 'src/common/entities/deletable.entity';
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, Unique } from 'typeorm';
 
 type LoginType = 'LOCAL' | 'GOOGLE' | 'FACEBOOK' | 'KAKAO';
 

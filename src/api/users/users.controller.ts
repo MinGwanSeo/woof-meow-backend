@@ -1,34 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res } from '@nestjs/common'
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { TypedBody, TypedRoute } from "@nestia/core";
+import { ControllerSignupRoutePath } from './user.const';
 
-@Controller('users')
+@Controller(ControllerSignupRoutePath)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
-
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
-
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  constructor(
+    private readonly usersService: UsersService
+  ) {
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(+id);
-  // }
+  @TypedRoute.Post('email')
+  async signupEmail(
+    @TypedBody() input: CreateUserDto,
+  ) {
+    // 유저 생성
+    await this.usersService.signupEmail(input);
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
+    // jwt 생성 및 쿠키에 저장
+  }
 }
